@@ -314,7 +314,7 @@ def scrape_transfer_articulation(from_school, to_school, debug=False):
     except Exception as e:
         return {'error': f'Failed to scrape articulation data: {str(e)}'}
 
-def scrape_course_articulation(from_school, to_school, year_name="2025-2026", debug=False):
+def scrape_course_articulation(from_school, to_school, year_name="2025-2026", debug=False, max_retries=2):
     """
     Scrape detailed course articulation from assist.org using Playwright
     
@@ -323,126 +323,196 @@ def scrape_course_articulation(from_school, to_school, year_name="2025-2026", de
         to_school: Name of the school student is transferring to
         year_name: Academic year (e.g., "2025-2026")
         debug: If True, include additional debugging info
+        max_retries: Number of times to retry on failure
     
     Returns:
         Dictionary containing course articulation data
     """
     
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.goto("https://www.assist.org", wait_until='networkidle')
-            time.sleep(3)
-            
-            result = {
+    def attempt_scrape():
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.set_default_timeout(15000)
+                page.goto("https://www.assist.org", wait_until='domcontentloaded')
+                time.sleep(2)
+                
+                result = {
+                    'from_school': from_school,
+                    'to_school': to_school,
+                    'year': year_name,
+                    'courses': [],
+                    'error': None,
+                    'debug_info': {}
+                }
+                
+                try:
+                    page.wait_for_selector('ng-select', timeout=15000)
+                    ng_selects = page.query_selector_all('ng-select')
+                    
+                    if debug:
+                        result['debug_info']['ng_selects_found'] = len(ng_selects)
+                    
+                    if len(ng_selects) >= 2:
+                        to_selector = ng_selects[1]
+                        from_selector = ng_selects[0]
+                        
+                        try:
+                            to_input = to_selector.query_selector('input[type="search"]')
+                            if not to_input:
+                                to_input = to_selector.query_selector('input')
+                            
+                            if to_input:
+                                to_input.click(timeout=5000)
+                                time.sleep(0.5)
+                                to_input.fill("")
+                                to_input.fill(to_school)
+                                time.sleep(1)
+                                
+                                page.wait_for_selector('[role="option"]', timeout=8000)
+                                options = page.query_selector_all('[role="option"]')
+                                if options:
+                                    options[0].click(timeout=5000)
+                                    time.sleep(1.5)
+                        except Exception as e:
+                            if debug:
+                                result['debug_info']['to_school_error'] = str(e)
+                        
+                        try:
+                            from_input = from_selector.query_selector('input[type="search"]')
+                            if not from_input:
+                                from_input = from_selector.query_selector('input')
+                            
+                            if from_input:
+                                from_input.click(timeout=5000)
+                                time.sleep(0.5)
+                                from_input.fill("")
+                                from_input.fill(from_school)
+                                time.sleep(1)
+                                
+                                page.wait_for_selector('[role="option"]', timeout=8000)
+                                options = page.query_selector_all('[role="option"]')
+                                if options:
+                                    options[0].click(timeout=5000)
+                                    time.sleep(1.5)
+                        except Exception as e:
+                            if debug:
+                                result['debug_info']['from_school_error'] = str(e)
+                        
+                        try:
+                            page.wait_for_selector('table tbody tr, .course-table tr, [class*="course"] tr', timeout=12000)
+                            time.sleep(1)
+                        except:
+                            if debug:
+                                result['debug_info']['no_table_found'] = True
+                    
+                    html = page.content()
+                    soup = BeautifulSoup(html, 'html.parser')
+                    
+                    course_rows = soup.find_all('tr')
+                    
+                    for row in course_rows:
+                        cells = row.find_all(['td', 'th'])
+                        if len(cells) >= 2:
+                            from_course = cells[0].get_text(strip=True)
+                            to_course = cells[1].get_text(strip=True)
+                            
+                            if (from_course and to_course and 
+                                len(from_course) > 1 and len(to_course) > 1 and
+                                from_course.lower() not in ['course', 'courses', 'from course', 'prerequisite'] and
+                                to_course.lower() not in ['course', 'courses', 'to course', 'transfer to']):
+                                
+                                units = None
+                                if len(cells) > 2:
+                                    units_text = cells[2].get_text(strip=True)
+                                    try:
+                                        units = float(units_text)
+                                    except:
+                                        units = units_text if units_text else None
+                                
+                                result['courses'].append({
+                                    'from_course': from_course,
+                                    'to_course': to_course,
+                                    'units': units
+                                })
+                    
+                    if debug:
+                        result['debug_info']['courses_found'] = len(result['courses'])
+                
+                except Exception as e:
+                    result['error'] = f'Failed during scraping: {str(e)}'
+                    if debug:
+                        result['debug_info']['scrape_error'] = str(e)
+                
+                browser.close()
+                
+                return result
+        
+        except Exception as e:
+            return {
                 'from_school': from_school,
                 'to_school': to_school,
                 'year': year_name,
-                'courses': [],
-                'error': None,
-                'debug_info': {}
+                'error': f'Failed to scrape course articulation: {str(e)}',
+                'courses': []
             }
-            
-            # Debug: Check page structure
-            if debug:
-                inputs = page.query_selector_all('input')
-                result['debug_info']['total_inputs'] = len(inputs)
-                selects = page.query_selector_all('select')
-                result['debug_info']['total_selects'] = len(selects)
-            
-            # Try to find and fill school dropdowns
-            try:
-                # Wait for inputs to be available
-                page.wait_for_selector('input[placeholder*="institution"]', timeout=5000)
-                
-                # Look for school selector inputs
-                inputs = page.query_selector_all('input[placeholder*="institution"]')
-                
-                if debug:
-                    result['debug_info']['institution_inputs_found'] = len(inputs)
-                
-                if len(inputs) >= 2:
-                    # Fill "to" school (receiving institution)
-                    to_input = inputs[1]
-                    to_input.click()
-                    to_input.fill(to_school)
-                    time.sleep(1)
-                    page.keyboard.press('ArrowDown')
-                    time.sleep(0.5)
-                    page.keyboard.press('Enter')
-                    time.sleep(2)
-                    
-                    # Fill "from" school (sending institution)
-                    from_input = inputs[0]
-                    from_input.click()
-                    from_input.fill(from_school)
-                    time.sleep(1)
-                    page.keyboard.press('ArrowDown')
-                    time.sleep(0.5)
-                    page.keyboard.press('Enter')
-                    time.sleep(2)
-                    
-                    if debug:
-                        result['debug_info']['schools_filled'] = True
-            except Exception as e:
-                if debug:
-                    result['debug_info']['schools_error'] = str(e)
-            
-            # Try to select year
-            try:
-                selects = page.query_selector_all('select')
-                if selects:
-                    page.select_option(selects[0], year_name)
-                    time.sleep(3)
-            except Exception as e:
-                if debug:
-                    result['debug_info']['year_error'] = str(e)
-            
-            # Wait for content
-            time.sleep(3)
-            
-            # Try multiple selectors to find course data
-            try:
-                html = page.content()
-                soup = BeautifulSoup(html, 'html.parser')
-                
-                # Look for course rows in various table formats
-                course_rows = soup.find_all('tr')
-                
-                for row in course_rows:
-                    cells = row.find_all('td')
-                    if len(cells) >= 2:
-                        from_course = cells[0].get_text(strip=True)
-                        to_course = cells[1].get_text(strip=True)
-                        
-                        # Filter out header rows and empty rows
-                        if (from_course and to_course and 
-                            len(from_course) > 2 and len(to_course) > 2 and
-                            'course' not in from_course.lower() and 'course' not in to_course.lower()):
-                            result['courses'].append({
-                                'from_course': from_course,
-                                'to_course': to_course
-                            })
-            except Exception as e:
-                if debug:
-                    result['debug_info']['scrape_error'] = str(e)
-            
-            if debug:
-                result['debug_info']['courses_found'] = len(result['courses'])
-            
-            browser.close()
-            
-            return result
     
-    except Exception as e:
-        return {
-            'from_school': from_school,
-            'to_school': to_school,
-            'year': year_name,
-            'error': f'Failed to scrape course articulation: {str(e)}',
-            'courses': []
-        }
+    for attempt in range(max_retries + 1):
+        result = attempt_scrape()
+        if not result.get('error') or attempt == max_retries:
+            if debug and attempt > 0:
+                result['debug_info']['retry_attempt'] = attempt
+            return result
+        time.sleep(2 ** attempt)
+    
+    return result
+
+def get_degree_information(from_school, to_school, year_name="2025-2026", debug=False):
+    """
+    Get degree transfer information with REST API agreement data
+    
+    Args:
+        from_school: Name of the school student is transferring from
+        to_school: Name of the school student is transferring to
+        year_name: Academic year (e.g., "2025-2026")
+        debug: If True, include additional debugging info
+    
+    Returns:
+        Dictionary containing degree transfer information with assist.org link
+    """
+    
+    result = {
+        'from_school': from_school,
+        'to_school': to_school,
+        'year': year_name,
+        'agreement': None,
+        'assist_url': 'https://www.assist.org',
+        'error': None
+    }
+    
+    agreement_result = scrape_transfer_articulation(from_school, to_school, debug=debug)
+    
+    if agreement_result.get('error'):
+        result['error'] = agreement_result['error']
+        return result
+    
+    agreements = agreement_result.get('agreements', [])
+    if not agreements:
+        result['error'] = 'No transfer agreement found for this school pair'
+        return result
+    
+    agreement = agreements[0]
+    result['agreement'] = {
+        'from_school': from_school,
+        'to_school': to_school,
+        'institution_name': agreement.get('institution_name'),
+        'institution_code': agreement.get('institution_code'),
+        'is_community_college': agreement.get('is_community_college'),
+        'years_supported': len(agreement.get('sending_year_ids', []))
+    }
+    
+    return result
 
 if __name__ == "__main__":
     result = scrape_transfer_articulation("Berkeley City College", "University of California, Berkeley")
