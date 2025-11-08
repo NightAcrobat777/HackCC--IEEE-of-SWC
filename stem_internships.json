@@ -1,0 +1,223 @@
+{
+  "internships": [
+    {
+      "company": "Google",
+      "role": "Software Engineering Intern",
+      "location": "Mountain View, CA",
+      "major": "Computer Science",
+      "source": "Simplify",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.google.com/about/careers/applications/",
+      "deadline": "Rolling"
+    },
+    {
+      "company": "Microsoft",
+      "role": "Software Engineering Intern",
+      "location": "Redmond, WA",
+      "major": "Computer Science/Engineering",
+      "source": "Simplify",
+      "date_found": "2025-11-08",
+      "apply_link": "https://careers.microsoft.com/students/us/en",
+      "deadline": "October 2025"
+    },
+    {
+      "company": "Amazon",
+      "role": "Software Development Engineer Intern",
+      "location": "Seattle, WA",
+      "major": "Computer Science",
+      "source": "Simplify",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.amazon.jobs/en/teams/internships-for-students",
+      "deadline": "Rolling"
+    },
+    {
+      "company": "Meta",
+      "role": "Software Engineer Intern",
+      "location": "Menlo Park, CA",
+      "major": "Computer Science",
+      "source": "Simplify",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.metacareers.com/jobs/",
+      "deadline": "November 2025"
+    },
+    {
+      "company": "Apple",
+      "role": "Software Engineering Intern",
+      "location": "Cupertino, CA",
+      "major": "Computer Science/Engineering",
+      "source": "Simplify",
+      "date_found": "2025-11-08",
+      "apply_link": "https://jobs.apple.com/en-us/search?team=internships-STDNT-INTRN",
+      "deadline": "Rolling"
+    },
+    {
+      "company": "Netflix",
+      "role": "Data Science Intern",
+      "location": "Los Gatos, CA",
+      "major": "Data Science/Statistics",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://jobs.netflix.com/jobs/",
+      "deadline": "December 2025"
+    },
+    {
+      "company": "Palo Alto Networks",
+      "role": "Cybersecurity Intern",
+      "location": "Santa Clara, CA",
+      "major": "Cybersecurity/Computer Science",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://jobs.paloaltonetworks.com/",
+      "deadline": "Rolling"
+    },
+    {
+      "company": "Tesla",
+      "role": "Electrical Engineering Intern",
+      "location": "Palo Alto, CA",
+      "major": "Electrical Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.tesla.com/careers/search/?type=3",
+      "deadline": "January 2026"
+    },
+    {
+      "company": "SpaceX",
+      "role": "Mechanical Engineering Intern",
+      "location": "Hawthorne, CA",
+      "major": "Mechanical Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.spacex.com/careers/",
+      "deadline": "November 2025"
+    },
+    {
+      "company": "Boeing",
+      "role": "Aerospace Engineering Intern",
+      "location": "Seattle, WA",
+      "major": "Aerospace Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://jobs.boeing.com/internship",
+      "deadline": "October 2025"
+    },
+    {
+      "company": "Medtronic",
+      "role": "Biomedical Engineering Intern",
+      "location": "Minneapolis, MN",
+      "major": "Biomedical Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://jobs.medtronic.com/students",
+      "deadline": "February 2026"
+    },
+    {
+      "company": "Dow Chemical",
+      "role": "Chemical Engineering Intern",
+      "location": "Midland, MI",
+      "major": "Chemical Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://corporate.dow.com/careers/students-and-graduates.html",
+      "deadline": "January 2026"
+    },
+    {
+      "company": "Jane Street",
+      "role": "Quantitative Research Intern",
+      "location": "New York, NY",
+      "major": "Mathematics/Physics/Computer Science",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.janestreet.com/join-jane-street/internships/",
+      "deadline": "November 2025"
+    },
+    {
+      "company": "OpenAI",
+      "role": "Machine Learning Intern",
+      "location": "San Francisco, CA",
+      "major": "Computer Science/Data Science",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://openai.com/careers/",
+      "deadline": "Rolling"
+    },
+    {
+      "company": "Nvidia",
+      "role": "Software Engineering Intern",
+      "location": "Santa Clara, CA",
+      "major": "Computer Science/Computer Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://nvidia.wd5.myworkdayjobs.com/UniversityJobs",
+      "deadline": "December 2025"
+    },
+    {
+      "company": "Intel",
+      "role": "Hardware Engineering Intern",
+      "location": "Santa Clara, CA",
+      "major": "Computer Engineering/Electrical Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://jobs.intel.com/students",
+      "deadline": "Rolling"
+    },
+    {
+      "company": "IBM",
+      "role": "Data Science Intern",
+      "location": "Armonk, NY",
+      "major": "Data Science/Computer Science",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.ibm.com/employment/internship/",
+      "deadline": "March 2026"
+    },
+    {
+      "company": "Lockheed Martin",
+      "role": "Aerospace Engineering Intern",
+      "location": "Bethesda, MD",
+      "major": "Aerospace Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.lockheedmartinjobs.com/students",
+      "deadline": "January 2026"
+    },
+    {
+      "company": "Raytheon",
+      "role": "Electrical Engineering Intern",
+      "location": "Waltham, MA",
+      "major": "Electrical Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://jobs.rtx.com/students",
+      "deadline": "February 2026"
+    },
+    {
+      "company": "Pfizer",
+      "role": "Biomedical Research Intern",
+      "location": "New York, NY",
+      "major": "Biology/Biomedical Engineering",
+      "source": "Direct",
+      "date_found": "2025-11-08",
+      "apply_link": "https://www.pfizer.com/about/careers/students-and-recent-graduates",
+      "deadline": "March 2026"
+    }
+  ],
+  "total_count": 20,
+  "last_updated": "2025-11-08 13:33:20",
+  "stem_majors": [
+    "Computer Science",
+    "Software Engineering",
+    "Computer Engineering",
+    "Data Science",
+    "Electrical Engineering",
+    "Mechanical Engineering",
+    "Chemical Engineering",
+    "Aerospace Engineering",
+    "Biomedical Engineering",
+    "Mathematics",
+    "Physics",
+    "Biology",
+    "Chemistry",
+    "Information Technology",
+    "Cybersecurity"
+  ]
+}
