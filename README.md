@@ -18,6 +18,9 @@ A comprehensive platform for California community college students with AI-power
 ├── apis/
 │   ├── api.py                          # Unified Flask REST API (transfers, internships, mentorships)
 │   ├── example_api_test.py             # Comprehensive API testing script
+│   ├── test_api_and_generate_colleges.py  # Test API and generate colleges.json
+│   ├── generate_comprehensive_colleges.py # Generate comprehensive colleges.json
+│   ├── TESTING_AND_DATA_GENERATION.md # Testing documentation
 │   ├── combined_api/                   # Transfer & internship modules
 │   │   ├── api.py                      # Transfer & internship endpoints
 │   │   ├── scraper.py                  # assist.org scraper
@@ -32,6 +35,17 @@ A comprehensive platform for California community college students with AI-power
 │   ├── API.md                          # Complete API documentation
 │   └── scraper.py                      # Transfer scraper utility
 ├── llm-chat-app-template/              # Chat interface frontend
+│   ├── public/                          # Static frontend assets
+│   │   ├── index.html                   # Chat UI
+│   │   └── chat.js                      # Chat interface script
+│   ├── src/                             # TypeScript source code
+│   │   ├── index.ts                     # Worker entry point
+│   │   └── types.ts                     # TypeScript type definitions
+│   ├── test/                            # Test files
+│   ├── package.json                     # Node dependencies
+│   ├── tsconfig.json                    # TypeScript configuration
+│   ├── wrangler.jsonc                   # Cloudflare Workers config
+│   └── README.md                        # Chat app documentation
 ├── README.md                           # This file
 ├── 2026_internships.json               # Internship data
 ├── stem_internships.json               # STEM-specific internships
@@ -63,6 +77,31 @@ Server runs on **`http://localhost:5000`**
 API documentation available at: **`http://localhost:5000/`**
 
 **Note**: The API expects data files (`2026_internships.json`, `stem_internships.json`, `mentorship_opportunities.json`, `colleges.json`) to be in the `apis/` directory. Copy them from the root directory if needed.
+
+## Testing & Data Generation
+
+### Generate Comprehensive Colleges List
+
+```bash
+cd apis
+python3 generate_comprehensive_colleges.py
+```
+
+This script generates a complete `colleges.json` with all California transfer institutions (community colleges, CSU, UC, and private universities).
+
+### Test All API Endpoints
+
+```bash
+# Terminal 1: Start the API
+python3 api.py
+
+# Terminal 2: Run comprehensive tests
+python3 test_api_and_generate_colleges.py
+```
+
+This tests all endpoints and validates data across transfers, internships, and mentorships modules.
+
+See **[apis/TESTING_AND_DATA_GENERATION.md](apis/TESTING_AND_DATA_GENERATION.md)** for detailed documentation on testing and data generation scripts.
 
 ## API Endpoints Overview
 
