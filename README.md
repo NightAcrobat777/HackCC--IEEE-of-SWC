@@ -6,22 +6,26 @@ An AI chatbot that helps students find transfer agreements between California co
 
 ```
 ├── scraper.py                 # Core API scraper for assist.org
-├── example_usage.py          # Usage examples
+├── api.py                     # Flask REST API server
+├── example_usage.py          # Direct scraper usage examples
+├── example_api_usage.py      # Flask API usage examples
 ├── colleges.json             # List of California institutions
 ├── llm-chat-app-template/    # Cloudflare Workers chat interface
+├── API.md                    # Flask API documentation
 ├── CLAUDE.md                 # Development notes
+├── README.md                 # This file
 └── venv/                     # Python virtual environment
 ```
 
 ## Quick Start
 
-### Backend (Python Scraper)
-
-#### Setup
+### Setup
 ```bash
 cd /home/eli/HackCC---IEEE---SWC
 source venv/bin/activate
 ```
+
+### Option 1: Python Scraper (Direct)
 
 #### Run Examples
 ```bash
@@ -43,8 +47,44 @@ if not result.get('error'):
     print(f"To: {agreement['to_school']}")
     print(f"Pathway: {agreement['institution_name']}")
     print(f"Years: {agreement['years_supported']}")
-    print(f"View courses: {result['assist_url']}")
+    print(f"View: {result['assist_url']}")
 ```
+
+### Option 2: Flask API (Recommended for Chat Integration)
+
+#### Install Dependencies
+```bash
+pip install flask flask-cors
+```
+
+#### Start API Server
+```bash
+./venv/bin/python3 api.py
+```
+
+Server runs on `http://localhost:5000`
+
+#### Check Transfer Agreement
+```bash
+curl -X POST http://localhost:5000/api/transfer \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from_school": "Southwestern College",
+    "to_school": "University of California, Berkeley"
+  }'
+```
+
+#### Search Schools
+```bash
+curl http://localhost:5000/api/schools?q=berkeley
+```
+
+#### Run Example Script
+```bash
+./venv/bin/python3 example_api_usage.py
+```
+
+**See [API.md](API.md) for full documentation.**
 
 ### API Response Format
 

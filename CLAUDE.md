@@ -1,17 +1,22 @@
-# Running the Scraper
+# Development Notes
 
-## Virtual Environment
+## Running Examples
+
+### Direct Scraper
 ```bash
 ./venv/bin/python3 example_usage.py
+```
+
+### Flask API
+```bash
+./venv/bin/python3 api.py  # Start server on http://localhost:5000
+./venv/bin/python3 example_api_usage.py  # Run example client
 ```
 
 ## Linting/Typecheck
 ```bash
 ./venv/bin/python3 -m flake8 scraper.py --max-line-length=100
 ```
-
-## Tests
-No automated tests currently. Run examples for validation.
 
 ## Key Functions
 
@@ -20,11 +25,11 @@ No automated tests currently. Run examples for validation.
 - **Returns**: Agreement metadata (institution name, code, supported years)
 - **Reliable**: 100% - Uses REST API only
 
-### 2. `get_degree_information(from_school, to_school, include_course_url=True, debug=False)`
+### 2. `get_degree_information(from_school, to_school, year_name="2025-2026", debug=False)`
 - **Fast**: ~1-2 seconds
-- **Returns**: Agreement + pre-filled course URL for assist.org
-- **Recommended**: Best option for hackathon - provides all needed info with fast performance
-- **Course URL Format**: `https://www.assist.org/?from={from_id}&to={to_id}&year={year_id}`
+- **Returns**: Agreement data + link to assist.org
+- **Recommended**: Best option - simple, reliable, and fast
+- **Returns**: Agreement details + assist_url for manual browsing
 
 ## Recommended Usage Strategy
 
