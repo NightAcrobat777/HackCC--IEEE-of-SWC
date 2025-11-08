@@ -216,6 +216,234 @@ def scrape_from_html(html_content):
     
     return data
 
+def get_institution_id(name):
+    """
+    Get institution ID from assist.org API
+    
+    Args:
+        name: Institution name
+    
+    Returns:
+        Institution ID or None
+    """
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get('https://www.assist.org/api/institutions', headers=headers, timeout=10)
+        response.raise_for_status()
+        institutions = response.json()
+        
+        for inst in institutions:
+            inst_names = inst.get('names', [])
+            for name_obj in inst_names:
+                if name_obj.get('name', '').lower() == name.lower():
+                    return inst.get('id')
+        
+        return None
+    except Exception as e:
+        return None
+
+def scrape_transfer_articulation(from_school, to_school, debug=False):
+    """
+    Get transfer articulation data from assist.org API
+    
+    Args:
+        from_school: Name of the school student is transferring from
+        to_school: Name of the school student is transferring to
+        debug: If True, include additional debugging info
+    
+    Returns:
+        Dictionary containing transfer articulation data
+    """
+    
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        
+        from_id = get_institution_id(from_school)
+        to_id = get_institution_id(to_school)
+        
+        result = {
+            'from_school': from_school,
+            'to_school': to_school,
+            'from_id': from_id,
+            'to_id': to_id,
+            'agreements': [],
+            'error': None
+        }
+        
+        if not from_id or not to_id:
+            result['error'] = f'Could not find institution IDs. From: {from_id}, To: {to_id}'
+            return result
+        
+        agreements_url = f'https://www.assist.org/api/institutions/{to_id}/agreements'
+        response = requests.get(agreements_url, headers=headers, timeout=10)
+        response.raise_for_status()
+        agreements = response.json()
+        
+        if debug:
+            result['all_agreements_count'] = len(agreements)
+        
+        seen_institution_ids = set()
+        for agreement in agreements:
+            if agreement.get('institutionParentId') == from_id:
+                inst_id = agreement.get('institutionParentId')
+                if inst_id not in seen_institution_ids:
+                    seen_institution_ids.add(inst_id)
+                    result['agreements'].append({
+                        'institution_name': agreement.get('institutionName'),
+                        'institution_code': agreement.get('code'),
+                        'is_community_college': agreement.get('isCommunityCollege'),
+                        'sending_year_ids': agreement.get('sendingYearIds'),
+                        'receiving_year_ids': agreement.get('receivingYearIds'),
+                        'from_id': from_id,
+                        'to_id': to_id
+                    })
+        
+        if result['agreements'] and result['agreements'][0].get('id'):
+            agreement_id = result['agreements'][0]['id']
+            courses_url = f'https://www.assist.org/api/agreements/{agreement_id}/courses'
+            try:
+                courses_response = requests.get(courses_url, headers=headers, timeout=10)
+                courses_response.raise_for_status()
+                courses = courses_response.json()
+                result['courses'] = courses
+            except Exception as e:
+                result['courses_error'] = str(e)
+        
+        return result
+    
+    except Exception as e:
+        return {'error': f'Failed to scrape articulation data: {str(e)}'}
+
+def scrape_course_articulation(from_school, to_school, year_name="2025-2026", debug=False):
+    """
+    Scrape detailed course articulation from assist.org using Playwright
+    
+    Args:
+        from_school: Name of the school student is transferring from
+        to_school: Name of the school student is transferring to
+        year_name: Academic year (e.g., "2025-2026")
+        debug: If True, include additional debugging info
+    
+    Returns:
+        Dictionary containing course articulation data
+    """
+    
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto("https://www.assist.org", wait_until='networkidle')
+            time.sleep(3)
+            
+            result = {
+                'from_school': from_school,
+                'to_school': to_school,
+                'year': year_name,
+                'courses': [],
+                'error': None,
+                'debug_info': {}
+            }
+            
+            # Debug: Check page structure
+            if debug:
+                inputs = page.query_selector_all('input')
+                result['debug_info']['total_inputs'] = len(inputs)
+                selects = page.query_selector_all('select')
+                result['debug_info']['total_selects'] = len(selects)
+            
+            # Try to find and fill school dropdowns
+            try:
+                # Wait for inputs to be available
+                page.wait_for_selector('input[placeholder*="institution"]', timeout=5000)
+                
+                # Look for school selector inputs
+                inputs = page.query_selector_all('input[placeholder*="institution"]')
+                
+                if debug:
+                    result['debug_info']['institution_inputs_found'] = len(inputs)
+                
+                if len(inputs) >= 2:
+                    # Fill "to" school (receiving institution)
+                    to_input = inputs[1]
+                    to_input.click()
+                    to_input.fill(to_school)
+                    time.sleep(1)
+                    page.keyboard.press('ArrowDown')
+                    time.sleep(0.5)
+                    page.keyboard.press('Enter')
+                    time.sleep(2)
+                    
+                    # Fill "from" school (sending institution)
+                    from_input = inputs[0]
+                    from_input.click()
+                    from_input.fill(from_school)
+                    time.sleep(1)
+                    page.keyboard.press('ArrowDown')
+                    time.sleep(0.5)
+                    page.keyboard.press('Enter')
+                    time.sleep(2)
+                    
+                    if debug:
+                        result['debug_info']['schools_filled'] = True
+            except Exception as e:
+                if debug:
+                    result['debug_info']['schools_error'] = str(e)
+            
+            # Try to select year
+            try:
+                selects = page.query_selector_all('select')
+                if selects:
+                    page.select_option(selects[0], year_name)
+                    time.sleep(3)
+            except Exception as e:
+                if debug:
+                    result['debug_info']['year_error'] = str(e)
+            
+            # Wait for content
+            time.sleep(3)
+            
+            # Try multiple selectors to find course data
+            try:
+                html = page.content()
+                soup = BeautifulSoup(html, 'html.parser')
+                
+                # Look for course rows in various table formats
+                course_rows = soup.find_all('tr')
+                
+                for row in course_rows:
+                    cells = row.find_all('td')
+                    if len(cells) >= 2:
+                        from_course = cells[0].get_text(strip=True)
+                        to_course = cells[1].get_text(strip=True)
+                        
+                        # Filter out header rows and empty rows
+                        if (from_course and to_course and 
+                            len(from_course) > 2 and len(to_course) > 2 and
+                            'course' not in from_course.lower() and 'course' not in to_course.lower()):
+                            result['courses'].append({
+                                'from_course': from_course,
+                                'to_course': to_course
+                            })
+            except Exception as e:
+                if debug:
+                    result['debug_info']['scrape_error'] = str(e)
+            
+            if debug:
+                result['debug_info']['courses_found'] = len(result['courses'])
+            
+            browser.close()
+            
+            return result
+    
+    except Exception as e:
+        return {
+            'from_school': from_school,
+            'to_school': to_school,
+            'year': year_name,
+            'error': f'Failed to scrape course articulation: {str(e)}',
+            'courses': []
+        }
+
 if __name__ == "__main__":
-    result = get_institutions_list()
+    result = scrape_transfer_articulation("Berkeley City College", "University of California, Berkeley")
     print(json.dumps(result, indent=2))
