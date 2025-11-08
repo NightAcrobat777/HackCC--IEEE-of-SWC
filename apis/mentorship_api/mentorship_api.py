@@ -13,7 +13,7 @@ from datetime import datetime
 
 # Add parent directory to path to import mentorship_scraper
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mentorship_scraper import MentorshipScraper
+from apis.mentorship_scraper import MentorshipScraper
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes

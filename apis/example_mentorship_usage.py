@@ -4,7 +4,7 @@ Example usage of the mentorship scraper
 Demonstrates different ways to use the scraper
 """
 
-from mentorship_scraper import MentorshipScraper
+from apis.mentorship_scraper import MentorshipScraper
 
 def example_1_run_interactive():
     """

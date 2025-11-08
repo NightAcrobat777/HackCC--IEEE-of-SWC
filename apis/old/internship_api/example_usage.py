@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from scraper import scrape_transfer_articulation, get_degree_information
+from apis.scraper import scrape_transfer_articulation, get_degree_information
 import json
 
 print("=" * 100)
