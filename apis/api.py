@@ -574,6 +574,32 @@ def refresh_mentorship_data():
         return jsonify({'error': f'Failed to refresh data: {str(e)}'}), 500
 
 
+@app.route('/api/cs-articulations', methods=['GET'])
+def get_cs_articulations():
+    try:
+        cc_name = request.args.get('cc', '').strip()
+        uc_name = request.args.get('uc', '').strip()
+        
+        if not cc_name or not uc_name:
+            return jsonify({
+                'error': 'Missing required parameters: cc and uc'
+            }), 400
+        
+        return jsonify({
+            'message': 'CS course articulation lookup',
+            'from_cc': cc_name,
+            'to_uc': uc_name,
+            'note': 'CS articulation scraper requires browser automation. Use the cs_assist_scraper tool directly for detailed course mappings.',
+            'supported_ucs': [
+                'University of California, Berkeley',
+                'University of California, Los Angeles',
+                'University of California, San Diego'
+            ]
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Endpoint not found'}), 404
