@@ -1,16 +1,52 @@
-# HackCC - Unified Student Support Platform
+# BetterTransfer - AI-Powered College Transfer Assistant
 
-A comprehensive platform for California community college students with AI-powered assistance for college transfers, internship discovery, and mentorship opportunities.
+An intelligent platform built for California community college students to navigate their transfer journey from community college to 4-year universities. Created by Gabe, Eli, Angelo, and Tim for the HackCC hackathon (IEEE HackCC 2025).
 
 ## Features
 
-🎓 **College Transfer Programs** - Find articulation agreements between community colleges and 4-year universities
+### 🎯 **Interactive Transfer Planning**
+- **4-Step Guided Flow**: Intuitive card-based interface with progress tracking
+  1. Select your current community college
+  2. Choose target universities (multiple selections supported)
+  3. Pick your major
+  4. Review and confirm your transfer profile
+- **Smart Search**: Real-time search with relevance sorting and debouncing for smooth UX
+- **Multi-School Selection**: Select and compare multiple target universities simultaneously
+- **Profile Persistence**: Your selections are saved and used throughout the chat experience
 
-💼 **Internship Discovery** - Browse and filter internship opportunities by company, location, and category
+### 🤖 **AI Transfer Assistant**
+- **Context-Aware Chat**: AI assistant with knowledge of your profile (community college, target schools, major)
+- **Natural Language Queries**: Ask questions in plain English about your transfer journey
+- **Streaming Responses**: Real-time AI responses with markdown formatting support
+- **Quick Actions**: One-click access to common queries
+  - "What are the transfer requirements?"
+  - "Find internships in my field"
+  - "Mentorship programs available?"
+  - "Free resources and programs"
 
-👥 **Mentorship Programs** - Discover mentorship opportunities by major, organization, and format
+### 🎓 **College Transfer Programs**
+- **Transfer Agreement Lookup**: Check articulation agreements between your CC and target universities
+- **assist.org Integration**: Direct access to official California transfer data
+- **Multi-School Comparison**: See transfer agreements for all your selected universities at once
 
-🤖 **AI Chat Interface** - Integrated chatbot for natural language queries across all services
+### 💼 **Internship Discovery**
+- **Major-Specific Search**: Find internships tailored to your field of study
+- **STEM Opportunities**: Dedicated STEM internship database with 2026 opportunities
+- **Company & Location Filters**: Browse by company, location, season, and category
+- **API Integration**: Real-time access to curated internship database
+
+### 👥 **Mentorship Programs**
+- **Community College Focus**: Programs specifically designed for CC transfer students
+- **Free Resources**: Dedicated filtering for no-cost mentorship opportunities
+- **Organization Directory**: Browse programs by major, organization, and format
+- **Instant Recommendations**: AI provides personalized mentorship suggestions
+
+### 🎨 **Modern User Experience**
+- **Custom Cursor**: Elegant custom cursor with hover effects and click ripples
+- **Smooth Animations**: Card-based transitions with Swiper.js
+- **Responsive Design**: Mobile-optimized interface that works on all devices
+- **Center-Stage Chat**: Full-width chat interface that slides in from the center
+- **Back Navigation**: Easy navigation between form and chat with preserved state
 
 ## Project Structure
 
@@ -34,18 +70,19 @@ A comprehensive platform for California community college students with AI-power
 │   ├── mentorship_scraper.py           # Mentorship data scraper
 │   ├── API.md                          # Complete API documentation
 │   └── scraper.py                      # Transfer scraper utility
-├── llm-chat-app-template/              # Chat interface frontend
+├── llm-chat-app-template/              # Frontend web application
 │   ├── public/                          # Static frontend assets
-│   │   ├── index.html                   # Chat UI
-│   │   └── chat.js                      # Chat interface script
+│   │   ├── index.html                   # Main application UI (BetterTransfer interface)
+│   │   ├── colleges.json                # California colleges database
+│   │   └── chat.js                      # Chat interface utilities
 │   ├── src/                             # TypeScript source code
-│   │   ├── index.ts                     # Worker entry point
+│   │   ├── index.ts                     # Cloudflare Worker entry point
 │   │   └── types.ts                     # TypeScript type definitions
 │   ├── test/                            # Test files
 │   ├── package.json                     # Node dependencies
 │   ├── tsconfig.json                    # TypeScript configuration
 │   ├── wrangler.jsonc                   # Cloudflare Workers config
-│   └── README.md                        # Chat app documentation
+│   └── README.md                        # Frontend documentation
 ├── README.md                           # This file
 ├── 2026_internships.json               # Internship data
 ├── stem_internships.json               # STEM-specific internships
@@ -58,14 +95,37 @@ A comprehensive platform for California community college students with AI-power
 
 ## Quick Start
 
+### Prerequisites
+
+- Python 3.8+
+- Node.js 16+ (for frontend development)
+- Virtual environment (recommended)
+
 ### Setup
 
+1. **Clone and navigate to the project:**
 ```bash
-cd /home/eli/HackCC---IEEE---SWC
-source venv/bin/activate
+cd HackCC---IEEE---SWC
 ```
 
-### Start the Unified API Server
+2. **Set up Python virtual environment:**
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+3. **Copy data files to API directory:**
+```bash
+cp colleges.json apis/
+cp 2026_internships.json apis/
+cp stem_internships.json apis/
+cp mentorship_opportunities.json apis/
+```
+
+### Running the Application
+
+#### Start the Backend API Server
 
 ```bash
 cd apis
@@ -76,7 +136,53 @@ Server runs on **`http://localhost:5000`**
 
 API documentation available at: **`http://localhost:5000/`**
 
-**Note**: The API expects data files (`2026_internships.json`, `stem_internships.json`, `mentorship_opportunities.json`, `colleges.json`) to be in the `apis/` directory. Copy them from the root directory if needed.
+#### Start the Frontend (Development)
+
+**Option 1: Simple HTTP Server**
+```bash
+cd llm-chat-app-template/public
+python3 -m http.server 8000
+```
+
+Open **`http://localhost:8000`** in your browser
+
+**Option 2: Cloudflare Workers (Local Development)**
+```bash
+cd llm-chat-app-template
+npm install
+npm run dev
+```
+
+#### Full Stack Setup
+
+1. **Terminal 1 - Backend API:**
+   ```bash
+   cd apis && python3 api.py
+   ```
+
+2. **Terminal 2 - Frontend:**
+   ```bash
+   cd llm-chat-app-template/public
+   python3 -m http.server 8000
+   ```
+
+3. **Open Browser:**
+   Navigate to `http://localhost:8000`
+
+### Using the Application
+
+1. **Landing Page**: Click "Get Started →" to begin
+2. **Step 1 - Community College**: Search and select your current CC
+3. **Step 2 - Target Universities**: Select one or more target schools
+4. **Step 3 - Major**: Choose your intended major
+5. **Step 4 - Summary**: Review your selections
+6. **Chat Assistant**: Click "Chat with Transfer Assistant →" to start getting personalized help
+
+The AI assistant will use your profile to provide tailored advice on:
+- Transfer requirements and articulation agreements
+- Relevant internship opportunities in your field
+- Mentorship programs for your major
+- Free resources available to CC transfer students
 
 ## Testing & Data Generation
 
@@ -108,6 +214,8 @@ See **[apis/TESTING_AND_DATA_GENERATION.md](apis/TESTING_AND_DATA_GENERATION.md)
 ### Transfer Programs
 
 - `POST /api/transfer/check` - Check transfer agreement between schools
+  - Used by Quick Action: "What are the transfer requirements?"
+  - Returns agreement details, years supported, and assist.org URL
 - `GET /api/transfer/schools` - Search/list all colleges
 - `GET /health` - Health check
 
@@ -119,7 +227,9 @@ See **[apis/TESTING_AND_DATA_GENERATION.md](apis/TESTING_AND_DATA_GENERATION.md)
 - `GET /api/internships/companies` - List all companies
 - `GET /api/internships/locations` - List all locations
 - `GET /api/internships/categories` - List all categories
-- `GET /api/stem-internships` - STEM-specific internships
+- `GET /api/stem-internships` - STEM-specific internships (filtered by major)
+  - Used by Quick Action: "Find internships in my field"
+  - Returns internships matching user's major
 - `POST /api/internships/refresh` - Refresh internship data
 
 ### Mentorships
@@ -130,8 +240,19 @@ See **[apis/TESTING_AND_DATA_GENERATION.md](apis/TESTING_AND_DATA_GENERATION.md)
 - `GET /api/mentorships/organizations` - List all organizations
 - `GET /api/mentorships/majors` - List all supported majors
 - `GET /api/mentorships/free` - Free mentorship programs
+  - Used by Quick Action: "Free resources and programs"
+  - Returns no-cost opportunities for students
 - `GET /api/mentorships/community-college` - Community college friendly programs
+  - Used by Quick Action: "Mentorship programs available?"
+  - Returns CC-specific mentorship opportunities
 - `POST /api/mentorships/refresh` - Refresh mentorship data
+
+### AI Chat
+
+- `POST /api/chat` - AI-powered chat endpoint
+  - Accepts: `{ messages: [...], userProfile: {...} }`
+  - Returns: Streaming response with AI-generated answers
+  - Context-aware using user's CC, target schools, and major
 
 **See [apis/API.md](apis/API.md) for complete endpoint documentation.**
 
@@ -217,15 +338,87 @@ response = requests.get('http://localhost:5000/api/stem-internships?major=comput
 print(response.json())
 ```
 
-## Chat Interface
+## Frontend Architecture
 
-```bash
-cd llm-chat-app-template
-npm install
-npm run dev
+### Technologies
+
+- **Vanilla JavaScript**: No framework dependencies for maximum performance
+- **Swiper.js**: Card-based UI with smooth transitions
+- **Marked.js**: Markdown rendering for AI chat responses
+- **CSS3**: Modern gradients, animations, and responsive design
+- **Cloudflare Workers**: Serverless deployment option for AI chat API
+
+### Key Components
+
+#### 1. Landing Page
+- Hero section with "Get Started" CTA
+- Smooth slide transition to main app
+
+#### 2. Card Stack Interface
+- **Card 1**: Community College selection with live search
+- **Card 2**: Target Universities multi-select with tag display
+- **Card 3**: Major selection with live search
+- **Card 4**: Summary and confirmation
+- Progress bar with 4 segments tracking user journey
+- Swiper.js cards effect for layered appearance
+
+#### 3. Search System
+- **Debounced Input**: 200ms delay for smooth performance
+- **Relevance Sorting**: Results starting with search term appear first
+- **Live Filtering**: Real-time results as you type
+- **Result Limiting**: Max 8 results displayed
+- **Selected State**: Visual feedback for chosen items
+
+#### 4. AI Chat Interface
+- **Full-Screen Modal**: Centers on screen with backdrop
+- **Streaming Responses**: Real-time AI response display
+- **Message History**: Persistent conversation state
+- **Quick Actions**: 4 one-click shortcuts for common queries
+- **Profile Integration**: Automatically includes user's transfer profile
+- **Back Navigation**: Return to form with preserved state
+
+#### 5. User Experience Features
+- **Custom Cursor**: Dot and outline with smooth following animation
+- **Click Ripples**: Visual feedback on all interactions
+- **Hover Effects**: Interactive elements respond to cursor
+- **Mobile Optimized**: Touch-friendly with standard cursor on mobile
+- **Smooth Transitions**: 350ms cubic-bezier animations
+- **Accessibility**: Keyboard navigation and semantic HTML
+
+### Data Flow
+
+```
+User Profile Form → localStorage → Chat Assistant → API Calls
+                                         ↓
+                            Context-Aware Responses
 ```
 
-See `llm-chat-app-template/README.md` for full setup and deployment instructions.
+1. User completes 4-step form
+2. Profile saved to `window.userProfile` and `localStorage`
+3. Chat assistant accesses profile for personalized queries
+4. Quick actions trigger API calls with user context
+5. AI responses stream back in real-time
+
+### File Structure
+
+```
+llm-chat-app-template/
+├── public/
+│   ├── index.html (2,263 lines)
+│   │   ├── HTML structure
+│   │   ├── Embedded CSS (~1,200 lines)
+│   │   └── Embedded JavaScript (~1,000 lines)
+│   └── colleges.json
+│       └── Combined list of CA community colleges and universities
+```
+
+## Backend Architecture
+
+- **Unified REST API**: Single Flask entry point for all services (transfers, internships, mentorships)
+- **assist.org Integration**: Uses public REST API for real-time transfer agreement data
+- **Local JSON Storage**: Internship and mentorship data cached locally for fast queries
+- **Flask Framework**: Lightweight, scalable HTTP server with CORS enabled
+- **Cloudflare Workers AI**: Serverless AI chat API with streaming responses
 
 ## Development
 
@@ -236,61 +429,200 @@ cd apis
 python3 -m flake8 api.py --max-line-length=100
 ```
 
-### Running Tests
+### Frontend Development
 
+**Local Testing:**
 ```bash
-cd apis
-python3 example_api_test.py
+cd llm-chat-app-template/public
+python3 -m http.server 8000
 ```
+
+**Cloudflare Workers (with AI chat):**
+```bash
+cd llm-chat-app-template
+npm install
+npm run dev
+```
+
+See `llm-chat-app-template/README.md` for deployment instructions.
 
 ## Architecture
 
-- **Unified REST API**: Single entry point for all services (transfers, internships, mentorships)
-- **assist.org Integration**: Uses public REST API for transfer agreement data
-- **Local JSON Storage**: Internship and mentorship data cached locally for fast queries
-- **Flask Framework**: Lightweight, scalable HTTP server
-- **CORS Enabled**: Works with any frontend framework
+### System Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        BetterTransfer                           │
+│                    (Frontend - index.html)                      │
+│                                                                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │   Landing    │→│  Card Stack  │→│  AI Chat     │         │
+│  │     Page     │  │  (4 Steps)   │  │  Assistant   │         │
+│  └──────────────┘  └──────────────┘  └──────────────┘         │
+│                           ↓                   ↓                 │
+│                    User Profile         API Requests            │
+│                   (localStorage)              ↓                 │
+└─────────────────────────────────────────────────────────────────┘
+                                                ↓
+                         ┌──────────────────────────────────────┐
+                         │    Cloudflare Workers AI             │
+                         │      /api/chat (Streaming)           │
+                         └──────────────────────────────────────┘
+                                                ↓
+┌─────────────────────────────────────────────────────────────────┐
+│               Flask REST API (localhost:5000)                   │
+│                                                                 │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐           │
+│  │  Transfer   │  │ Internships │  │ Mentorships │           │
+│  │     API     │  │     API     │  │     API     │           │
+│  └─────────────┘  └─────────────┘  └─────────────┘           │
+│        ↓                 ↓                 ↓                    │
+│  assist.org API    JSON Files       JSON Files                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### User Journey
+
+1. **Welcome** → User lands on BetterTransfer homepage
+2. **Profile Setup** → 4-step guided form:
+   - Current community college
+   - Target universities (1+)
+   - Intended major
+   - Confirmation summary
+3. **AI Chat** → Context-aware assistant with Quick Actions:
+   - Transfer requirements (fetches from assist.org)
+   - Internship opportunities (filtered by major)
+   - Mentorship programs (CC-focused)
+   - Free resources
+4. **Natural Queries** → User can ask follow-up questions in plain English
+5. **Streaming Responses** → AI provides detailed, personalized guidance
 
 ## Performance
 
-- Transfer check: ~1-2 seconds (REST API call to assist.org)
-- School search: <100ms (local JSON lookup)
-- Internship queries: <100ms (local JSON lookup)
-- Mentorship queries: <100ms (local JSON lookup)
+- **Frontend Load**: <1s (single HTML file, minimal dependencies)
+- **Card Transitions**: 600ms smooth animations
+- **Search Debouncing**: 200ms delay for optimal UX
+- **Transfer Agreement Lookup**: ~1-2 seconds (live assist.org API)
+- **School/Internship/Mentorship Search**: <100ms (local JSON)
+- **AI Chat Response**: Streaming (starts in <1s, completes based on query)
 
 ## What Works ✅
 
-- ✅ Transfer agreement lookup between CA community colleges and 4-year universities
-- ✅ Internship discovery with multiple filters
-- ✅ Mentorship program search and filtering
-- ✅ Statistics and analytics for all categories
-- ✅ Community college-specific features
-- ✅ Free program identification
-- ✅ STEM-specific opportunities
-- ✅ Pagination and pagination offsets
+### Core Features
+- ✅ **4-Step Profile Builder** with live search and multi-select
+- ✅ **Transfer Agreement Lookup** between CA community colleges and universities
+- ✅ **AI Chat Assistant** with streaming responses and markdown support
+- ✅ **Quick Actions** for instant access to common queries
+- ✅ **Internship Discovery** with major-based filtering (2026 opportunities)
+- ✅ **Mentorship Programs** with CC-specific and free options
+- ✅ **Profile Persistence** via localStorage
+- ✅ **Back Navigation** between form and chat with state preservation
+
+### UI/UX
+- ✅ **Custom Cursor** with smooth animations and click ripples
+- ✅ **Card Stack Interface** with Swiper.js
+- ✅ **Responsive Design** optimized for mobile and desktop
+- ✅ **Real-time Search** with debouncing and relevance sorting
+- ✅ **Progress Tracking** with 4-segment progress bar
+- ✅ **Smooth Transitions** throughout the application
+
+### API Integration
+- ✅ **assist.org Integration** for official CA transfer data
+- ✅ **Context-Aware AI** using user profile in queries
+- ✅ **Multiple Target Schools** support in single request
+- ✅ **STEM Internship Database** with company and location data
+- ✅ **Free Resource Identification** across all categories
+
+## Use Cases
+
+1. **Transfer Planning**: "I'm at Southwestern College and want to transfer to UC Berkeley for Computer Science. What courses do I need?"
+
+2. **Internship Search**: "Find me summer 2026 CS internships in San Diego"
+
+3. **Mentorship Discovery**: "Are there any free mentorship programs for community college students in STEM?"
+
+4. **Multi-School Comparison**: "Compare transfer requirements for UCSD, UCLA, and UC Berkeley"
+
+5. **Deadline Tracking**: "When are the transfer application deadlines for UC schools?"
+
+6. **GPA Requirements**: "What GPA do I need to transfer to San Diego State?"
 
 ## Deployment
 
-### Production Setup
+### Backend API (Production)
 
 ```bash
 # Install production WSGI server
 pip install gunicorn
 
 # Run with Gunicorn
+cd apis
 gunicorn -w 4 -b 0.0.0.0:5000 api:app
 
 # Or use with reverse proxy (Nginx)
 # Configure upstream server to http://localhost:5000
 ```
 
+### Frontend (Cloudflare Workers)
+
+```bash
+cd llm-chat-app-template
+npm install
+wrangler login
+wrangler deploy
+```
+
+The frontend can be deployed to:
+- **Cloudflare Workers**: Serverless with built-in AI chat
+- **Static Hosting**: Any CDN (Vercel, Netlify, GitHub Pages)
+- **Traditional Server**: Nginx, Apache, etc.
+
+## Team
+
+**Created for IEEE HackCC 2025 Hackathon**
+
+- **Gabe** - Frontend & UX Design
+- **Eli** - Backend API & assist.org Integration  
+- **Angelo** - Data Collection & Testing
+- **Tim** - AI Integration & Documentation
+
 ## Contributing
 
-1. Follow PEP 8 style guidelines
-2. Run linting before commits
-3. Add tests for new endpoints
-4. Update API.md for endpoint changes
+1. Follow PEP 8 style guidelines for Python code
+2. Use ESLint for JavaScript (if adding external JS files)
+3. Run linting before commits
+4. Add tests for new API endpoints
+5. Update API.md for endpoint changes
+6. Test on both desktop and mobile devices
+
+## Technologies Used
+
+### Frontend
+- HTML5, CSS3, JavaScript (ES6+)
+- Swiper.js 11.x (Card UI)
+- Marked.js 11.x (Markdown rendering)
+- Web APIs (localStorage, Fetch, Streams)
+
+### Backend
+- Python 3.8+
+- Flask (REST API)
+- Requests (HTTP client)
+- assist.org REST API
+
+### AI/ML
+- Cloudflare Workers AI
+- Llama models (text generation)
+- Streaming responses
+
+### Deployment
+- Cloudflare Workers (Frontend + AI)
+- Gunicorn (Backend production)
+- Any cloud platform (AWS, GCP, Azure, etc.)
 
 ## License
 
 IEEE HackCC 2025
+
+---
+
+**BetterTransfer** - Making college transfer journeys smoother, one student at a time. 🎓✨
