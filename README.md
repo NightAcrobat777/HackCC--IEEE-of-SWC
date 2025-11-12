@@ -1,6 +1,6 @@
 # TransferReady - AI-Powered College Transfer Assistant
 
-An intelligent platform built for California community college students to navigate their transfer journey from community college to 4-year universities. Created by Gabe, Eli, Angelo, and Tim for the HackCC hackathon (IEEE HackCC 2025).
+An intelligent platform built for California community college students to navigate their transfer journey from community college to 4-year universities. Created by Gabriel, Eli, Angelo, and Tim for the HackCC hackathon (IEEE HackCC 2025).
 
 ## Features
 
@@ -581,7 +581,7 @@ The frontend can be deployed to:
 
 **Created for IEEE HackCC 2025 Hackathon**
 
-- **Gabe** - Frontend & UX Design
+- **Gabriel** - Frontend & UX Design
 - **Eli** - Backend API & assist.org Integration  
 - **Angelo** - Data Collection & Testing
 - **Tim** - AI Integration & Documentation
