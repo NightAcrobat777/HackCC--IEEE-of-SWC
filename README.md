@@ -621,7 +621,7 @@ The frontend can be deployed to:
 
 ## License
 
-IEEE HackCC 2025
+IEEE SWC 2025
 
 ---
 
